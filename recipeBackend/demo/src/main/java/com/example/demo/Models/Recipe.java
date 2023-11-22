@@ -23,25 +23,35 @@ public class Recipe {
 	    private List<String> ingredients;
 	    private String overallCookingTime;
 		private String isVegetarian;
-		private long searchId;
+		private long search;
+
+		public Recipe(){
+
+		}
+	
 
 	    public Recipe(String nationality, String name, String instructions, List<String> ingredients, String overallCookingTime, String isVegetarian) {
 	        this.nationality = nationality;
 			this.isVegetarian = isVegetarian;
 	        this.name = name;
+			search = 0;
 	        this.instructions = instructions;
 	        this.ingredients = ingredients;
-			searchId = id;
 	        this.overallCookingTime = overallCookingTime;
 	    }
+
+		public long getSearch(){
+			return search;
+		}
+		public void setSearch(Long num){
+			search = num;
+		}
+
 
 	    public String getNationality() {
 	        return nationality;
 	    }
 
-		public void setSearchId(Long num){
-			searchId = num;
-		}
 
 		public long getID(){
 			return id;

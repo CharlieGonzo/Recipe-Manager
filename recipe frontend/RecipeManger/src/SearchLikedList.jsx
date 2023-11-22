@@ -6,6 +6,25 @@ const SearchLikedList = (props) => {
   let likedItems = [];
   likedItems.push(UserList);
   let likedStringItems = likedItems.map((integer) => String(integer));
+  class Recipe {
+    constructor(
+      id,
+      nationality,
+      name,
+      instructions,
+      ingredients,
+      overallCookingTime,
+      search
+    ) {
+      this.id = id;
+      this.nationality = nationality;
+      this.name = name;
+      this.instructions = instructions;
+      this.ingredients = ingredients;
+      this.overallCookingTime = overallCookingTime;
+      this.search = search;
+    }
+  }
   console.log(likedStringItems);
   const [searchQuery, setSearchQuery] = useState("");
   const [items, setItems] = useState(likedStringItems);

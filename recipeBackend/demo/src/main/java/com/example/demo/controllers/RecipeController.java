@@ -24,12 +24,24 @@ public class RecipeController {
 
     @GetMapping("/getRecipes")
     public List<Recipe> getAllRecipes() {
+        List<Recipe> rec = recipeService.getAllRecipes();
+        for(int i = 0;i<rec.size();i++){
+            for(int j = 0;j<rec.get(i).getIngredients().size();j++){
+                String originalIngredient = rec.get(i).getIngredients().get(j);
+                rec.get(i).getIngredients().set(j, originalIngredient + " ");
+            }
+        }
         return recipeService.getAllRecipes();
     }
 
     @GetMapping("/Recipe/{id}")
     public Recipe getRecipeById(@PathVariable long id) {
-        return recipeService.getRecipeById(id).orElse(null);
+        Recipe recipe = recipeService.getRecipeById(id).get();
+        if(recipe.getSearch() == 0){
+       recipe.setSearch(recipe.getID());
+       saveRecipe(recipe);
+        }
+        return recipeService.getRecipeById(id).get();
     }
 
     @PostMapping("/Recipe/save")
@@ -38,7 +50,7 @@ public class RecipeController {
         return "done";
     }
 
-    @DeleteMapping("/Recipe/{id}")
+    @DeleteMapping("/Recipe/delete/{id}")
     public void deleteRecipe(@PathVariable long id) {
         recipeService.deleteRecipe(id);
     }
