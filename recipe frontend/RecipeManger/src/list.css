@@ -1,0 +1,40 @@
+/* styles.css */
+
+/* Container styles */
+.contain {
+  max-width: 1000px;
+  width: 400px;
+  max-height: 200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Search bar styles */
+input {
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  flex-shrink: 0; /* Do not allow the search bar to shrink */
+}
+
+/* List styles */
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  height: 200px;
+  overflow-y: auto;
+}
+
+li {
+  padding: 10px;
+  margin-bottom: 5px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* Hover effect on list items */
+li:hover {
+  background-color: #e0e0e0;
+}
