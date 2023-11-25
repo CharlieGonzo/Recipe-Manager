@@ -31,6 +31,7 @@ public class RecipeController {
                 rec.get(i).getIngredients().set(j, originalIngredient + " ");
             }
         }
+        
         return recipeService.getAllRecipes();
     }
 

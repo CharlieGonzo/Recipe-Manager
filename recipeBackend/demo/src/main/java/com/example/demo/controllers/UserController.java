@@ -39,7 +39,6 @@ public class UserController {
     @GetMapping("/login")
     public ResponseEntity<User> login(@RequestParam String username,@RequestParam String password){
         List<User> list = getAllUsers();
-        System.out.println(username);
         for(int i = 0;i<list.size();i++){
             if(username.equals(list.get(i).getUsername()) && password.equals(list.get(i).getPassword()))
                 return ResponseEntity.ok().body(list.get(i));
