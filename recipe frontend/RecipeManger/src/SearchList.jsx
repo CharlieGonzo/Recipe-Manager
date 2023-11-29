@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./list.css";
 
 const SearchList = (props) => {
-  const { recipeList } = props;
+  const { recipeList, onFavorite, remove } = props;
 
   // State for search query and list of items
   const [searchQuery, setSearchQuery] = useState("");
@@ -15,12 +15,24 @@ const SearchList = (props) => {
 
   // Effect to update filtered items when the recipe list or search query changes
   useEffect(() => {
-    // Filter items based on the search query
-    const filteredItems = recipeList.filter((recipe) =>
+    const filtered = recipeList.filter((recipe) =>
       recipe.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
-    setFilteredItems(filteredItems);
+    setFilteredItems(filtered);
   }, [recipeList, searchQuery]);
+
+  // Function to handle marking a recipe as a favorite
+  const handleFavorite = (recipe) => {
+    // Call the onFavorite function passed from the parent component
+    // to handle marking a recipe as a favorite
+    if (onFavorite) {
+      onFavorite(recipe);
+    }
+
+    if (remove) {
+      remove(recipe);
+    }
+  };
 
   return (
     <div className="contain">
@@ -33,13 +45,16 @@ const SearchList = (props) => {
       />
 
       {/* List View */}
-      <ul className="conatiner">
+      <ul className="container">
         {filteredItems.map((recipe) => (
           <li key={recipe.id}>
             <h5>
               {recipe.name}
               <h4>Ingredients: {recipe.ingredients}</h4>
               <h4>{recipe.overallCookingTime}</h4>
+              <button onClick={() => handleFavorite(recipe)}>
+                <i className="fa-solid fa-star"></i> Add to Favorites
+              </button>
             </h5>
           </li>
         ))}
