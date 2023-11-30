@@ -28,10 +28,6 @@ const SearchList = (props) => {
     if (onFavorite) {
       onFavorite(recipe);
     }
-
-    if (remove) {
-      remove(recipe);
-    }
   };
 
   return (
@@ -52,6 +48,7 @@ const SearchList = (props) => {
               {recipe.name}
               <h4>Ingredients: {recipe.ingredients}</h4>
               <h4>{recipe.overallCookingTime}</h4>
+              <h4>Vegetarian: {recipe.isVegetarian}</h4>
               <button onClick={() => handleFavorite(recipe)}>
                 <i className="fa-solid fa-star"></i> Add to Favorites
               </button>

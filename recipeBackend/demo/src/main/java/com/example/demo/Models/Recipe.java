@@ -22,6 +22,7 @@ public class Recipe {
 	    private String instructions;
 	    private List<String> ingredients;
 	    private String overallCookingTime;
+		@Column(name = "isVegetarian")
 		private String isVegetarian;
 		private long search;
 

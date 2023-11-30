@@ -1,11 +1,16 @@
 import "./App.css";
 import { useRef, useState } from "react";
 import MainPage from "./MainPage";
+import SignUpPage from "./SignUpPage";
 function LoginPage() {
   const usernameRef = useRef(null);
   const passwordRef = useRef(null);
+  const [signUp, setSignUp] = useState(false);
   const [loggedInUser, setLoggedInUser] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  function sign() {
+    setSignUp(true);
+  }
   function login() {
     const backendUrl = "http://localhost:8080/api/v1/";
 
@@ -45,25 +50,30 @@ function LoginPage() {
       });
   }
 
-  if (!isLoggedIn) {
+  if (signUp) {
+    return <SignUpPage />;
+  } else if (!isLoggedIn) {
     return (
       <div className="body">
         <div className="loginBox">
           <h1 className="title">Recipe Manager</h1>
           <div className="userInputFields">
             <div className="userInputFields">
-              <input ref={passwordRef} type="password" id="password" />
-              <label htmlFor="password">Password</label>
+              <label htmlFor="username">Username</label>
+              <input ref={usernameRef} type="text" id="username" />
             </div>
             <p>
               <br />
             </p>
             <div className="userInputFields">
-              <input ref={usernameRef} type="text" id="username" />
-              <label htmlFor="username">Username</label>
+              <label htmlFor="password">Password</label>
+              <input ref={passwordRef} type="password" id="password" />
             </div>
           </div>
-          <button onClick={login}>Login</button>
+          <div className="buttonContainer">
+            <button onClick={login}>Login</button>
+            <button onClick={sign}>Sign up</button>
+          </div>
         </div>
       </div>
     );

@@ -1,5 +1,7 @@
 package com.example.demo.controllers;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,40 +31,70 @@ public class UserController {
 
     private final UserServiceClass userService;
      @Autowired
-    private RecipeServiceClass recipeService; // Assuming you have a recipeService
+    private RecipeServiceClass recipeService; // Assuming you have a recipeService 
 
-    @PostMapping("/likeRecipe/{userId}/{recipeId}")
-    public ResponseEntity<String> likeRecipe(@PathVariable long userId, @PathVariable int recipeId) {
-        Optional<User> optionalUser = userService.getUserById(userId);
-        Optional<Recipe> optionalRecipe = recipeService.getRecipeById(recipeId);
 
-        if (optionalUser.isPresent() && optionalRecipe.isPresent()) {
-            User user = optionalUser.get();
+    @PostMapping("/likeRecipe/{id}")
+    public ResponseEntity<String> likeRecipe(@RequestHeader("Authorization") String authorizationHeader, @PathVariable long id) {
+    // Extract username and password from Authorization header
+    String[] credentials = extractCredentials(authorizationHeader);
+   
+    if (credentials.length == 2) {
+        String username = credentials[0];
+        String password = credentials[1];
 
-            user.getList().add(recipeId);
+        User user = login(username, password).getBody();
+        Optional<Recipe> optionalRecipe = recipeService.getRecipeById(id);
+
+        if (user != null && optionalRecipe.isPresent()) {
+            user.addLike(id);
             saveUser(user);
-
             return ResponseEntity.ok("Recipe liked successfully");
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User or recipe not found");
         }
+    } else {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
     }
+}
 
-    @PostMapping("/dislikeRecipe/{userId}/{recipeId}")
-    public ResponseEntity<String> dislikeRecipe(@PathVariable long userId, @PathVariable int recipeId) {
-        Optional<User> optionalUser = userService.getUserById(userId);
+ @PostMapping("/dislikeRecipe/{id}")
+    public ResponseEntity<String> dislikeRecipe(@RequestHeader("Authorization") String authorizationHeader, @PathVariable long id) {
+    // Extract username and password from Authorization header
+    String[] credentials = extractCredentials(authorizationHeader);
+   
+    if (credentials.length == 2) {
+        String username = credentials[0];
+        String password = credentials[1];
 
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
+        User user = login(username, password).getBody();
+        Optional<Recipe> optionalRecipe = recipeService.getRecipeById(id);
 
-            user.getList().remove(Integer.valueOf(recipeId));
+        if (user != null && optionalRecipe.isPresent()) {
+            user.removeLike(id);
             saveUser(user);
-
             return ResponseEntity.ok("Recipe disliked successfully");
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User or recipe not found");
         }
+    } else {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
     }
+}
+
+private String[] extractCredentials(String authorizationHeader) {
+    String[] credentials = new String[2];
+    try {
+        String base64Credentials = authorizationHeader.substring("Basic".length()).trim();
+        byte[] decoded = Base64.getDecoder().decode(base64Credentials);
+        String credentialsString = new String(decoded, StandardCharsets.UTF_8);
+        credentials = credentialsString.split(":", 2);
+    } catch (Exception e) {
+        // Handle the exception, log or return an error response
+    }
+    return credentials;
+}
+
 
 
     @Autowired
@@ -72,6 +105,27 @@ public class UserController {
     @GetMapping("/add/{id}")
     public String test(@PathVariable long id){
        return "none";
+    }
+
+    @PostMapping("/SignUp")
+    public ResponseEntity<String> signUp(@RequestHeader("Authorization") String authorizationHeader){
+
+        User user = new User();
+        String[] credentials = extractCredentials(authorizationHeader);
+   
+         if (credentials.length == 2) {
+            String username = credentials[0];
+            String password = credentials[1];
+            user.setUsername(username);
+            user.setPassword(password);
+            saveUser(user);
+            return ResponseEntity.ok("user created");
+    }else{
+        return ResponseEntity.badRequest().body("credential error");
+    }
+    
+      
+
     }
 
     @GetMapping("/login")

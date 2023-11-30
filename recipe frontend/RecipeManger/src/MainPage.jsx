@@ -9,10 +9,30 @@ function MainPage(props) {
   const [allRecipes, setAllRecipes] = useState([]);
 
   const favorite = (item) => {
-    likeRecipe(item.id);
-    // If the item is not in likedRecipes, add it
-    if (!likedRecipes.includes(item)) {
+    const isLiked = likedRecipes.some((recipe) => recipe.id === item.id);
+
+    if (isLiked) {
+      // If already liked, dislike the recipe
+      dislikeRecipe(item.id);
+
+      // Remove the item from likedRecipes
+      const updatedLikedRecipes = likedRecipes.filter(
+        (recipe) => recipe.id !== item.id
+      );
+      setLikedRecipes(updatedLikedRecipes);
+
+      // Add the item back to allRecipes
+      setAllRecipes([...allRecipes, item]);
+    } else {
+      // If not liked, like the recipe and add it to likedRecipes
+      likeRecipe(item.id);
       setLikedRecipes([...likedRecipes, item]);
+
+      // Remove the liked item from allRecipes
+      const updatedAllRecipes = allRecipes.filter(
+        (recipe) => recipe.id !== item.id
+      );
+      setAllRecipes(updatedAllRecipes);
     }
   };
 
@@ -20,26 +40,39 @@ function MainPage(props) {
 
   const likeRecipe = async (recipeId) => {
     const backendUrl = "http://localhost:8080/api/v1";
+    let id = 4;
+    id = user.id;
+    const username = user.username; // Replace with your actual username
+    const password = user.password; // Replace with your actual password
+
+    const credentials = `${username}:${password}`;
+    const encodedCredentials = btoa(credentials); // Base64 encode the credentials
 
     try {
-      const response = await fetch(
-        `${backendUrl}/likeRecipe/${user.id}/${recipeId}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${backendUrl}/likeRecipe/${recipeId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Basic ${encodedCredentials}`,
+        },
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
 
-      const result = await response.json();
-      console.log(result);
+      const contentType = response.headers.get("Content-Type");
 
-      // You may want to update the state or perform other actions based on the result
+      if (contentType && contentType.includes("application/json")) {
+        const result = await response.json();
+        console.log(result);
+        // You may want to update the state or perform other actions based on the result
+      } else {
+        // Handle non-JSON response
+        const result = await response.text();
+        console.log(result);
+        // You may want to handle non-JSON response differently
+      }
     } catch (error) {
       console.error("Error:", error);
       // Handle errors as needed
@@ -48,24 +81,38 @@ function MainPage(props) {
 
   const dislikeRecipe = async (recipeId) => {
     const backendUrl = "http://localhost:8080/api/v1";
+    console.log(user.id);
+    const username = user.username; // Replace with your actual username
+    const password = user.password; // Replace with your actual password
 
+    const credentials = `${username}:${password}`;
+    const encodedCredentials = btoa(credentials); // Base64 encode the credentials
+    let id = 4;
+    id = user.id;
     try {
-      const response = await fetch(
-        `${backendUrl}/dislikeRecipe/${user.id}/${recipeId}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${backendUrl}/dislikeRecipe/${recipeId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Basic ${encodedCredentials}`,
+        },
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
+      const contentType = response.headers.get("Content-Type");
 
-      const result = await response.json();
-      console.log(result);
+      if (contentType && contentType.includes("application/json")) {
+        const result = await response.json();
+        console.log(result);
+        // You may want to update the state or perform other actions based on the result
+      } else {
+        // Handle non-JSON response
+        const result = await response.text();
+        console.log(result);
+        // You may want to handle non-JSON response differently
+      }
 
       // You may want to update the state or perform other actions based on the result
     } catch (error) {
@@ -74,29 +121,9 @@ function MainPage(props) {
     }
   };
 
-  const removeLike = (item) => {
-    // Remove the item from likedRecipes
-    dislikeRecipe(item.id);
-    const updatedLikedRecipes = likedRecipes.filter(
-      (recipe) => recipe.id !== item.id
-    );
-    setLikedRecipes(updatedLikedRecipes);
-    user.list = likedRecipes;
-  };
-
-  const removeLikeFromNonLiked = (item) => {
-    // Remove the item from allRecipes (non-liked list)
-    const updatedAllRecipes = allRecipes.filter(
-      (recipe) => recipe.id !== item.id
-    );
-    setAllRecipes(updatedAllRecipes);
-
-    // Add the item to likedRecipes
-    setLikedRecipes([...likedRecipes, item]);
-  };
-
   useEffect(() => {
     const fetchData = async () => {
+      console.log(user);
       try {
         const response = await fetch("http://localhost:8080/api/v1/getRecipes");
         if (!response.ok) {
@@ -104,11 +131,25 @@ function MainPage(props) {
         }
 
         const recipes = await response.json();
-        setAllRecipes(recipes);
-        const Liked = recipes.filter((recipe) =>
-          likedRecipes.includes(recipe.id)
-        );
-        setLikedRecipes(liked);
+        const recipeLikedIds = user.list;
+
+        // Separate liked and unliked recipes
+        const likedRecipes = [];
+        const unlikedRecipes = [];
+
+        for (const item of recipes) {
+          if (recipeLikedIds.includes(item.id)) {
+            likedRecipes.push(item);
+          } else {
+            unlikedRecipes.push(item);
+          }
+        }
+
+        setLikedRecipes(likedRecipes);
+        setAllRecipes(unlikedRecipes);
+
+        console.log("Liked Recipes:", likedRecipes);
+        console.log("Unliked Recipes:", allRecipes);
       } catch (error) {
         console.error("Error fetching recipe list:", error);
         // Handle the error as needed
@@ -127,13 +168,12 @@ function MainPage(props) {
         <SearchLikedList
           title="Liked Recipes"
           recipeList={likedRecipes}
-          onFavorite={removeLike}
+          onFavorite={favorite}
         />
         <SearchList
           title="All Recipes"
           recipeList={allRecipes}
           onFavorite={favorite}
-          remove={removeLikeFromNonLiked}
         />
       </div>
     </div>

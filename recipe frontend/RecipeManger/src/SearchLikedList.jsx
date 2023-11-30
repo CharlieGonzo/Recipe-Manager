@@ -48,7 +48,7 @@ const SearchLikedList = (props) => {
               <h4>Ingredients: {recipe.ingredients}</h4>
               <h4>{recipe.overallCookingTime}</h4>
               <button onClick={() => handleFavorite(recipe)}>
-                <i className="fa-solid fa-star"></i> Add to Favorites
+                <i className="fa-solid fa-star"></i> Remove from Favorites
               </button>
             </h5>
           </li>

@@ -21,15 +21,33 @@ public class User {
     private String username;
 
     private String password;
+    
 
     @ElementCollection
     private List<Integer> recipes;
 
     public User(){
+        
     }
 
     public String getUsername(){
         return username;
+    }
+
+    public void addLike(long num){
+        recipes.add(Integer.valueOf((int)num));
+    }
+
+    
+
+    public void removeLike(long num){
+        Integer id = Integer.valueOf((int)num);
+        for(int i = 0;i<recipes.size();i++){
+            if(id == num){
+                recipes.remove(i);
+                break;
+            }
+        }
     }
 
      public String getPassword(){
