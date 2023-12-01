@@ -2,12 +2,27 @@ import SearchList from "./SearchList";
 import SearchLikedList from "./SearchLikedList";
 import { useState, useEffect } from "react";
 import "./MainPage.css";
+import RecipePage from "./RecipePage";
+import LoginPage from "./LoginPage";
 function MainPage(props) {
   const { user } = props;
 
   const [likedRecipes, setLikedRecipes] = useState([]);
   const [allRecipes, setAllRecipes] = useState([]);
+  const [openRecipe, setOpenRecipe] = useState(false);
+  const [back, setBack] = useState(false);
 
+  const [selectedRecipe, setSelectedRecipe] = useState(null);
+
+  const changeToRecipePage = (recipe) => {
+    console.log(recipe);
+    setSelectedRecipe(recipe);
+    setOpenRecipe(true);
+  };
+
+  function returnToHomePage() {
+    setBack(true);
+  }
   const favorite = (item) => {
     const isLiked = likedRecipes.some((recipe) => recipe.id === item.id);
 
@@ -158,26 +173,36 @@ function MainPage(props) {
 
     fetchData();
   }, []);
-
-  return (
-    <div className="main">
-      <header>
-        <h1>Welcome {user.username}!</h1>
-      </header>
-      <div className="listContainer">
-        <SearchLikedList
-          title="Liked Recipes"
-          recipeList={likedRecipes}
-          onFavorite={favorite}
-        />
-        <SearchList
-          title="All Recipes"
-          recipeList={allRecipes}
-          onFavorite={favorite}
-        />
+  if (back) {
+    return <LoginPage />;
+  } else if (!openRecipe) {
+    return (
+      <div className="main">
+        <header>
+          <span>
+            <h1>Welcome {user.username}!</h1>
+          </span>
+        </header>
+        <button onClick={returnToHomePage}>Sign Out</button>
+        <div className="listContainer">
+          <SearchLikedList
+            title="Liked Recipes"
+            recipeList={likedRecipes}
+            onFavorite={favorite}
+            change={changeToRecipePage}
+          />
+          <SearchList
+            title="All Recipes"
+            recipeList={allRecipes}
+            onFavorite={favorite}
+            change={changeToRecipePage}
+          />
+        </div>
       </div>
-    </div>
-  );
+    );
+  } else {
+    return <RecipePage user={user} recipe={selectedRecipe} />;
+  }
 }
 
 export default MainPage;

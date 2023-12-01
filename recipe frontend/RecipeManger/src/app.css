@@ -47,6 +47,16 @@ input {
   flex-direction: column;
 }
 
+.recipePage {
+  display: flex;
+  width: 100%;
+  text-align: center;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+  height: 80vh;
+}
+
 .body {
   display: flex;
   justify-content: center;

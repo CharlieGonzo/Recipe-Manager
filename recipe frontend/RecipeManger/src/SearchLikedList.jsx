@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 const SearchLikedList = (props) => {
-  const { recipeList, onFavorite } = props;
+  const { recipeList, onFavorite, change } = props;
 
   // State for search query and list of items
   const [searchQuery, setSearchQuery] = useState("");
@@ -47,9 +47,12 @@ const SearchLikedList = (props) => {
               {recipe.name}
               <h4>Ingredients: {recipe.ingredients}</h4>
               <h4>{recipe.overallCookingTime}</h4>
-              <button onClick={() => handleFavorite(recipe)}>
-                <i className="fa-solid fa-star"></i> Remove from Favorites
-              </button>
+              <span>
+                <button onClick={() => handleFavorite(recipe)}>
+                  Remove from Favorites
+                </button>
+                <button onClick={() => change(recipe)}>Open Recipes</button>
+              </span>
             </h5>
           </li>
         ))}
